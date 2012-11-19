@@ -1,0 +1,19 @@
+<VirtualHost *:<%=@port%>>
+    ServerName <%=@servername%>
+
+    <% if @ssl or @port == 443 or @port == '443' -%>
+    SSLEngine on
+    SSLCipherSuite SSLv2:-LOW:-EXPORT:RC4+RSA
+    SSLCertificateFile      <%=@ssl_certificate_file%>
+    SSLCertificateKeyFile   <%=@ssl_certificate_key_file%>
+    SSLCertificateChainFile <%=@ssl_certificate_chain_file%>
+    SSLCACertificateFile    <%=@ssl_ca_certificate_file%>
+    <% end -%>
+
+    <% if @port == 80 -%>
+    RewriteEngine On
+    RewriteRule ^/(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+    <% end %>
+
+    <% if @includedir %>Include /etc/httpd/conf.d/<%=@includedir%>.d/*.conf<% end %> 
+</VirtualHost>

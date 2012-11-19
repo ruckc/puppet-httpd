@@ -1,0 +1,46 @@
+ServerName           <%= @servername %> 
+ServerTokens         <%= @servertokens %> 
+ServerRoot           "/etc/httpd"
+PidFile              run/httpd.pid
+Timeout              <%= @timeout %>
+KeepAlive            <%= @keepalive %>
+MaxKeepAliveRequests <%= @maxkeepaliverequests %>
+KeepAliveTimeout     <%= @keepalivetimeout %>
+<IfModule prefork.c>
+StartServers         <%= @prefork_startservers %>
+MinSpareServers      <%= @prefork_minspareservers %>
+MaxSpareServers      <%= @prefork_maxspareservers %>
+ServerLimit          <%= @prefork_serverlimit %>
+MaxClients           <%= @prefork_maxclients %>
+MaxRequestsPerChild  <%= @prefork_maxrequestsperchild %>
+</IfModule>
+<% @ports.each do |port| -%>
+Listen               <%= port %>
+NameVirtualHost      *:<%= port %>
+<% end -%><% @modules.each do |mod| -%>
+LoadModule           <%= mod %>_module modules/mod_<%= mod %>.so
+<% end -%>
+Include              conf.d/*.conf
+User                 apache
+Group                apache
+ServerAdmin          <%= @serveradmin %>
+UseCanonicalName     <%= @usecanonicalname %>
+DocumentRoot         "/var/www/html"
+<Directory />
+    Options          None
+    AllowOverride    None
+</Directory>
+<Directory "/var/www/html">
+    Options          None
+    AllowOverride    None
+</Directory>
+HostnameLookups      <%= @hostnamelookups %>
+ErrorLog             logs/error_log
+LogLevel             <%= @loglevel %>
+LogFormat            "%h %l %u %t \"%r\"  %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{SSL_CLIENT_S_DN_CN}e" combined
+LogFormat            "%h %l %u %t \"%r\"  %>s %b" common
+LogFormat            "%{Referer}i -> %U" referer
+LogFormat            "%{User-agent}i" agent
+CustomLog            logs/access_log combined
+ServerSignature      Off
+AddDefaultCharset    UTF-8
